@@ -24,9 +24,6 @@ class User(AbstractUser):
         'Фамилия',
         max_length=150
     )
-    password = models.CharField(
-        max_length=150
-    )
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ('email', 'first_name', 'last_name', 'password')
