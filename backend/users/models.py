@@ -1,25 +1,35 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from rest_framework.exceptions import ValidationError
+from .validators import validate_username
 
 
 class User(AbstractUser):
     email = models.EmailField(
-        verbose_name='Электронная почта',
+        'Электронная почта',
         unique=True,
         max_length=254
     )
-    first_name = models.CharField(
-        verbose_name='Имя',
+    username = models.CharField(
+        'Имя пользователя',
         max_length=150,
+        unique=True,
+        validators=[validate_username, ]
+    )
+    first_name = models.CharField(
+        'Имя',
+        max_length=150
     )
     last_name = models.CharField(
-        verbose_name='Фамилия',
-        max_length=150,
+        'Фамилия',
+        max_length=150
+    )
+    password = models.CharField(
+        max_length=150
     )
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ('email', 'first_name', 'last_name', 'password')
 
     class Meta:
         verbose_name = 'Пользователь'
