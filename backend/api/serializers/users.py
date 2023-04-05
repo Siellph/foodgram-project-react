@@ -1,8 +1,7 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
 from users.models import Follow, User
-
-from .recieps import RecipeShowInfoSerializer
 
 
 class UsersCreateSerializer(UserCreateSerializer):
@@ -19,8 +18,15 @@ class UsersCreateSerializer(UserCreateSerializer):
         )
         extra_kwargs = {'password': {'write_only': True}}
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise ValidationError(
+                'Невозможно создать пользователя с таким именем'
+            )
+        return value
 
-class UsersShowInfoSerializer(UserSerializer):
+
+class UsersInfoSerializer(UserSerializer):
     """Вывод информации о пользователе"""
     is_subscribed = SerializerMethodField(read_only=True)
 
@@ -32,7 +38,7 @@ class UsersShowInfoSerializer(UserSerializer):
             'email',
             'first_name',
             'last_name',
-            'is_subscribed'
+            'is_subscribed',
         )
 
     def get_is_subscribed(self, object):
@@ -42,16 +48,16 @@ class UsersShowInfoSerializer(UserSerializer):
         return Follow.objects.filter(user=user, author=object.id).exists()
 
 
-class FollowSerializer(UsersShowInfoSerializer):
+class FollowSerializer(UsersInfoSerializer):
     """Добавление/удаление/просмотр подписок"""
     recipes = SerializerMethodField(read_only=True)
     recieps_count = SerializerMethodField(read_only=True)
 
-    class Meta(UsersShowInfoSerializer.Meta):
-        fields = UsersShowInfoSerializer.Meta.fields
-        + ('recieps', 'recieps_count')
+    class Meta(UsersInfoSerializer.Meta):
+        fields = UsersInfoSerializer.Meta.fields + ('recieps', 'recieps_count')
 
     def get_recieps(self, object):
+        from .recipes import RecipeShowInfoSerializer
         request = self.context.get('request')
         context = {'request': request}
         recipe_limit = request.query_params.get('recipe_limit')
