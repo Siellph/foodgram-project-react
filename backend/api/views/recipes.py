@@ -1,6 +1,9 @@
 from api.filters import IngredientFilter, RecipeFilter
 from api.paginations import LimitPagination
 from api.permissions import IsAuthorOrReadOnly
+from api.serializers.recipes import (FavoriteSerializer, IngredientSerializer,
+                                     RecipeShowInfoSerializer,
+                                     ShoppingCartSerializer, TagSerializer)
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,9 +14,6 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from api.serializers.recipes import (FavoriteSerializer, IngredientSerializer,
-                                     RecipeShowInfoSerializer,
-                                     ShoppingCartSerializer, TagSerializer)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -62,11 +62,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
-            if object.exists():
-                object.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response({'error': 'Рецепта не существует'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            object.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['POST', 'DELETE'], detail=True)
     def favorite(self, request, pk):

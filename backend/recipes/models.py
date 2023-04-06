@@ -1,9 +1,7 @@
-from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
-
-User = get_user_model()
+from users.models import User
 
 
 class Ingredient(models.Model):
@@ -129,7 +127,7 @@ class RecipeIngredient(models.Model):
         ]
 
     def __str__(self):
-        return (f'{self.recipe}: {self.ingredient.name},'
+        return (f'{self.recipe.name}: {self.ingredient.name},'
                 f' {self.amount}, {self.ingredient.measurement_unit}')
 
 
@@ -158,7 +156,7 @@ class Favorite(models.Model):
         )
 
     def __str__(self):
-        return f'{self.recipe} в избранном у {self.user}'
+        return f'{self.recipe.name} в избранном у {self.user.username}'
 
 
 class ShoppingCart(models.Model):
@@ -186,4 +184,4 @@ class ShoppingCart(models.Model):
         )
 
     def __str__(self):
-        return f'{self.recipe} в корзине у {self.user}'
+        return f'{self.recipe.name} в корзине у {self.user.username}'
