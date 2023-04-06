@@ -27,7 +27,7 @@ class Ingredient(models.Model):
 class Tag(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=16,
+        max_length=32,
         unique=True
     )
     color = models.CharField(
@@ -35,7 +35,7 @@ class Tag(models.Model):
         verbose_name='Цвет'
     )
     slug = models.SlugField(
-        max_length=16,
+        max_length=32,
         verbose_name='Слаг',
         unique=True
     )
