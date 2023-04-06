@@ -132,4 +132,5 @@ dmypy.json
 .idea
 
 .vscode
-back_static
+backend/static/admin
+backend/static/rest_framework

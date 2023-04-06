@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -9,7 +10,9 @@ def get_list_allowed(allowed: str) -> list:
     return [host.strip() for host in allowed.split(',') if host.strip()]
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='django-secret-key')
 
@@ -46,11 +49,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'foodgram.urls'
-
+TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -95,7 +98,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
@@ -117,11 +119,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/back_static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'back_static/')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
-MEDIA_URL = '/back_media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'back_media/')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 
 DJOSER = {
     'HIDE_USERS': False,
