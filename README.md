@@ -11,20 +11,20 @@
 
 **Сервер:** NGINX, Gunicorn
 
-## Локальный запуск API проекта 
-Склонируйте проект на свой ПК 
+## Локальный запуск API проекта 👨🏼‍💻
+🔗Склонируйте проект на свой ПК 
 
 ~~~bash  
   git clone https://github.com/Siellph/foodgram-project-react.githttps://github.com/Siellph/foodgram-project-react.git
 ~~~
 
-Перейдите в бэкэнд часть проекта (туда где лежит файл manage.py)  
+⤵️Перейдите в бэкэнд часть проекта (туда где лежит файл manage.py)  
 
 ~~~bash  
   cd foodgram-project-react/backend
 ~~~
 
-Создайте виртуальное окружение  
+🔮Создайте виртуальное окружение  
 
 ~~~bash  
 python -m venv .venv #Windows
@@ -38,7 +38,7 @@ python3 -m venv .venv #Linux, MacOS
 . .venv/bin/activate #Linux, MacOS
 ~~~  
 
-Обновите pip и установите зависимости
+🔄Обновите pip и установите зависимости
 
 ~~~bash
 pip install --upgrade pip
@@ -64,14 +64,14 @@ pip install -r requirements.txt
 
 *Для этого в в файле backend/foodgram/setting.py замените БД на встроенную SQLite*
 
-~~~
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-~~~
+>~~~
+>DATABASES = {
+>    'default': {
+>        'ENGINE': 'django.db.backends.sqlite3',
+>        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+>    }
+>}
+>~~~
 
 ✏️Создайте в папке `backend` файл `.env` и пропишите следующее
 
@@ -118,7 +118,7 @@ python manage.py upload_data #Windows
 python3 manage.py upload_data #Linux, MacOS
 ~~~
 
-👮Создайте администратора
+:octocat:Создайте администратора
 
 ~~~bash
 python manage.py createsuperuser #Windows
