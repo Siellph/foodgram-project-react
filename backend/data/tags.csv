@@ -1,9 +1,5 @@
 name,color,slug
-Завтрак,#0bda51,breakfast
-Обед,#ffff66,lunch
-Ужин,#ffe4b5,dinner
-Просто,#b1ff00,simply
-Сложно,#ff9c00,difficult
-Средней сложности,#ff9292,medium-difficulty
-Острое,#ff0000,spicy
-Сладкое,#9980e4,dessert
+просто,#b1ff00,simply
+сложно,#ff9c00,difficult
+острое,#ff0000,spicy
+сладкое,#9980e4,dessert
