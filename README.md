@@ -83,14 +83,13 @@ DB_HOST=db
 DB_PORT=5432
 ~~~
 
-Скопируйте файлы из папки `/infra` на сервер в созданную ранее директорию. А так же скопируйте папки `/docs` и `/frontend`
+Скопируйте файлы из папки `/infra` на сервер в созданную ранее директорию. А так же скопируйте папку `/docs`
 
 :warning:Данное действие выполнятеся из терминала/командной строки локального компьютера
 
 ~~~bash
 scp -r infra/* <server user>@<server IP>:/home/<server user>/foodgram/
 scp -r docs/* <server user>@<server IP>:/home/<server user>/foodgram/docs/
-scp -r frontend/* <server user>@<server IP>:/home/<server user>/foodgram/frontend/
 ~~~
 
 Запустите Docker Compose на сервере из директории с файлом `docker-compose.yml`
