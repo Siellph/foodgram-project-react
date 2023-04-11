@@ -11,6 +11,101 @@
 
 **Сервер:** NGINX, Gunicorn
 
+[Сайт](http://siellph-foodgram.hopto.org/recipeshttp://siellph-foodgram.hopto.org/recipes)
+
+[Админ-зона](http://siellph-foodgram.hopto.org/admin/login/?next=/admin/)
+
+[Документация](http://siellph-foodgram.hopto.org/api/docs/)
+
+[API DRF](http://siellph-foodgram.hopto.org/api/)
+
+В файле `demoroles.txt` можно найти демострационные авторизационные данные
+
+## Запуск проекта на сервере
+
+Скачайте и распакуйте проект на локальную машину
+
+[Скачать](https://github.com/Siellph/foodgram-project-react/archive/refs/heads/master.zip)
+
+Подключитесь к своему серверу
+
+~~~bash
+ssh <server user>@<server IP>
+~~~
+
+Установите Docker, если не установлен
+
+~~~bash
+sudo apt install docker.io
+~~~
+
+Установите Docker Compose (Linux), если не установлен
+
+~~~bash
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+~~~
+
+Выдайте разрешения для docker-compose
+
+~~~bash
+sudo chmod +x /usr/local/bin/docker-compose
+~~~
+
+Создайте в домашней директории папку проекта и перейдите в неё
+
+~~~bash
+mkdir foodgram && cd foodgram/
+~~~
+
+Создайте дополнительные каталоги
+
+~~~bash
+mkdir docs frontend
+~~~
+
+Создайте файл `.env` с секретными ключами
+
+~~~bash
+touch .env
+~~~
+
+Заполните `.env` файл любым удобным вам способом
+
+~~~bash
+DEBUG=False
+SECRET_KEY=<Любой длинный серкретный ключ>
+ALLOWED_HOSTS=<Укажите разрешенные хосты>
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<Пароль от пользователя БД>
+DB_HOST=db
+DB_PORT=5432
+~~~
+
+Скопируйте файлы из папки `/infra` на сервер в созданную ранее директорию. А так же скопируйте папки `/docs` и `/frontend`
+
+:warning:Данное действие выполнятеся из терминала/командной строки локального компьютера
+
+~~~bash
+scp -r infra/* <server user>@<server IP>:/home/<server user>/foodgram/
+scp -r docs/* <server user>@<server IP>:/home/<server user>/foodgram/docs/
+scp -r frontend/* <server user>@<server IP>:/home/<server user>/foodgram/frontend/
+~~~
+
+Запустите Docker Compose на сервере из директории с файлом `docker-compose.yml`
+
+~~~bash
+sudo docker-compose up -d
+~~~
+
+После запуска сервера можно создать администратора и выполнить наполнение БД тэгами и ингредиентами
+
+~~~bash
+sudo docker exec -it app python manage.py createsuperuser
+sudo docker exec -it app python manage.py upload_data
+~~~
+
 ## Локальный запуск API проекта 👨🏼‍💻
 🔗Склонируйте проект на свой ПК 
 
