@@ -5,40 +5,41 @@ from users.models import Follow, User
 
 
 class UsersCreateSerializer(UserCreateSerializer):
-    """Обработка запросов создания пользователя"""
+    """Сериализатор для обработки запросов на создание пользователя.
+    Валидирует создание пользователя с юзернеймом 'me'."""
     class Meta:
         model = User
         fields = (
+            'email',
             'id',
             'username',
-            'email',
             'first_name',
             'last_name',
-            'password'
-        )
-        extra_kwargs = {'password': {'write_only': True}}
+            'password')
+
+        extra_kwargs = {"password": {"write_only": True}}
 
     def validate_username(self, value):
-        if value == 'me':
+        if value == "me":
             raise ValidationError(
-                'Невозможно создать пользователя с таким именем'
+                'Невозможно создать пользователя с таким именем!'
             )
         return value
 
 
-class UsersInfoSerializer(UserSerializer):
-    """Вывод информации о пользователе"""
+class UsersSerializer(UserSerializer):
+    """Сериализатор для отображения информации о пользователе."""
     is_subscribed = SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
         fields = (
+            'email',
             'id',
             'username',
-            'email',
             'first_name',
             'last_name',
-            'is_subscribed',
+            'is_subscribed'
         )
 
     def get_is_subscribed(self, object):
@@ -48,25 +49,24 @@ class UsersInfoSerializer(UserSerializer):
         return Follow.objects.filter(user=user, author=object.id).exists()
 
 
-class FollowSerializer(UsersInfoSerializer):
-    """Добавление/удаление/просмотр подписок"""
+class FollowSerializer(UsersSerializer):
+    """Сериализатор для добавления/удаления подписки, просмотра подписок."""
     recipes = SerializerMethodField(read_only=True)
-    recieps_count = SerializerMethodField(read_only=True)
+    recipes_count = SerializerMethodField(read_only=True)
 
-    class Meta(UsersInfoSerializer.Meta):
-        fields = UsersInfoSerializer.Meta.fields + ('recieps', 'recieps_count')
+    class Meta(UsersSerializer.Meta):
+        fields = UsersSerializer.Meta.fields + ('recipes', 'recipes_count')
 
-    def get_recieps(self, object):
-        from .recipes import RecipeShowInfoSerializer
+    def get_recipes(self, object):
+        from api.serializers.recipes import RecipeInfoSerializer
+
         request = self.context.get('request')
         context = {'request': request}
         recipe_limit = request.query_params.get('recipe_limit')
-        queryset = object.reciepe.all()
+        queryset = object.recipes.all()
         if recipe_limit:
-            queryset = queryset[int:(recipe_limit)]
-            return RecipeShowInfoSerializer(queryset,
-                                            context=context,
-                                            many=True).data
+            queryset = queryset[:int(recipe_limit)]
+        return RecipeInfoSerializer(queryset, context=context, many=True).data
 
     def get_recipes_count(self, object):
         return object.recipes.count()

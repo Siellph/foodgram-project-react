@@ -23,7 +23,7 @@ class RecipeAdmin(ModelAdmin):
     fields = ('image',
               ('name', 'author'),
               'text',
-              ('tags', 'coocking_time'),
+              ('tags', 'cooking_time'),
               'favorite')
 
     def display_tags(self, obj):

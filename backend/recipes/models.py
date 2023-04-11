@@ -1,7 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
-from users.models import User
+
+User = get_user_model()
 
 
 class Ingredient(models.Model):
@@ -25,7 +27,7 @@ class Ingredient(models.Model):
 class Tag(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=32,
+        max_length=16,
         unique=True
     )
     color = models.CharField(
@@ -33,7 +35,7 @@ class Tag(models.Model):
         verbose_name='Цвет'
     )
     slug = models.SlugField(
-        max_length=32,
+        max_length=16,
         verbose_name='Слаг',
         unique=True
     )
@@ -54,7 +56,7 @@ class Recipe(models.Model):
         related_name='recipe'
     )
     image = models.ImageField(
-        verbose_name='Изображение',
+        verbose_name='Картинка',
         upload_to='recipes/'
     )
     name = models.CharField(
@@ -64,7 +66,7 @@ class Recipe(models.Model):
     text = models.TextField(
         verbose_name='Описание'
     )
-    coocking_time = models.PositiveSmallIntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
         validators=(MinValueValidator(
             limit_value=1,
@@ -127,7 +129,7 @@ class RecipeIngredient(models.Model):
         ]
 
     def __str__(self):
-        return (f'{self.recipe.name}: {self.ingredient.name},'
+        return (f'{self.recipe}: {self.ingredient.name},'
                 f' {self.amount}, {self.ingredient.measurement_unit}')
 
 
@@ -156,7 +158,7 @@ class Favorite(models.Model):
         )
 
     def __str__(self):
-        return f'{self.recipe.name} в избранном у {self.user.username}'
+        return f'{self.recipe} в избранном у {self.user}'
 
 
 class ShoppingCart(models.Model):
@@ -184,4 +186,4 @@ class ShoppingCart(models.Model):
         )
 
     def __str__(self):
-        return f'{self.recipe.name} в корзине у {self.user.username}'
+        return f'{self.recipe} в корзине у {self.user}'

@@ -2,8 +2,8 @@ from api.filters import IngredientFilter, RecipeFilter
 from api.paginations import LimitPagination
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers.recipes import (FavoriteSerializer, IngredientSerializer,
-                                     RecipeShowInfoSerializer,
-                                     ShoppingCartSerializer, TagSerializer)
+                                     RecipeSerializer, ShoppingCartSerializer,
+                                     TagSerializer)
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -16,16 +16,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    """Обработка запросов на получение тегов"""
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-    permission_classes = (AllowAny,)
-    pagination_class = None
-
-
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """Обработка запросов на получение информации о ингридиентах"""
+    """Вьюсет для обработки запросов на получение ингредиентов."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend,)
@@ -34,12 +26,20 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет для обработки запросов на получение тегов."""
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = (AllowAny,)
+    pagination_class = None
+
+
 class RecipeViewSet(viewsets.ModelViewSet):
-    """Работа с рецептами. Обработка запросов на
-    создание/получение/редактирование/удаление рецепта.
-    Добавление/удаление рецепта в избранное/корзину"""
+    """Вьюсет для работы с рецептами.
+     Обработка запросов создания/получения/редактирования/удаления рецептов
+     Добавление/удаление рецепта в избранное и список покупок"""
     queryset = Recipe.objects.all()
-    serializer_class = RecipeShowInfoSerializer
+    serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = (IsAuthorOrReadOnly,)
@@ -62,8 +62,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
-            object.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            if object.exists():
+                object.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'error': 'Этого рецепта нет в списке'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['POST', 'DELETE'], detail=True)
     def favorite(self, request, pk):
@@ -79,30 +82,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = (
             "attachment; filename='shopping_cart.pdf'"
         )
-        pdf = canvas.Canvas(response)
+        p = canvas.Canvas(response)
         arial = ttfonts.TTFont('Arial', 'data/arial.ttf')
         pdfmetrics.registerFont(arial)
-        pdf.setFont('Arial', 14)
+        p.setFont('Arial', 14)
 
         ingredients = RecipeIngredient.objects.filter(
-            recipe__shopping_cart__user=request.user
-        ).values_list(
-            'ingredient__name', 'amount', 'ingredient__measurement_unit'
-        )
+            recipe__shopping_cart__user=request.user).values_list(
+            'ingredient__name', 'amount', 'ingredient__measurement_unit')
 
-        ingredient_list = {}
+        ingr_list = {}
         for name, amount, unit in ingredients:
-            if name not in ingredient_list:
-                ingredient_list[name] = {'amount': amount, 'unit': unit}
+            if name not in ingr_list:
+                ingr_list[name] = {'amount': amount, 'unit': unit}
             else:
-                ingredient_list[name]['amount'] += amount
+                ingr_list[name]['amount'] += amount
         height = 700
 
-        pdf.drawString(100, 750, 'Список покупок')
-        for i, (name, data) in enumerate(ingredient_list.items(), start=1):
-            pdf.drawString(
-                80, height, f"{i}. {name} - {data['amount']} {data['unit']}"
-            )
-        pdf.showPage()
-        pdf.save()
+        p.drawString(100, 750, 'Список покупок')
+        for i, (name, data) in enumerate(ingr_list.items(), start=1):
+            p.drawString(
+                80, height,
+                f"{i}. {name} – {data['amount']} {data['unit']}")
+            height -= 25
+        p.showPage()
+        p.save()
         return response

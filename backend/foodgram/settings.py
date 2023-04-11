@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -10,17 +9,18 @@ def get_list_allowed(allowed: str) -> list:
     return [host.strip() for host in allowed.split(',') if host.strip()]
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-SECRET_KEY = os.getenv('SECRET_KEY', default='django-secret-key')
+SECRET_KEY = os.getenv('SECRET_KEY', default='your_secret_key')
 
 DEBUG = os.getenv('DEBUG', default=True)
 
 ALLOWED_HOSTS = get_list_allowed(
     os.getenv('ALLOWED_HOSTS', default='localhost')
 )
+
+
+# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -29,13 +29,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+
     'recipes.apps.RecipesConfig',
     'users.apps.UsersConfig',
-    'api.apps.ApiConfig',
+    'api.apps.ApiConfig'
 ]
 
 MIDDLEWARE = [
@@ -49,11 +51,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'foodgram.urls'
-TEMPLATES_DIR = BASE_DIR / 'templates'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATES_DIR],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,6 +70,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
+
+# Database
+# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
@@ -78,6 +84,10 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', default='5432')
     }
 }
+
+
+# Password validation
+# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -94,10 +104,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
@@ -107,11 +119,15 @@ REST_FRAMEWORK = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 AUTH_USER_MODEL = 'users.User'
+
+# Internationalization
+# https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = os.getenv('TIME_ZONE')
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -119,12 +135,17 @@ USE_L10N = True
 
 USE_TZ = True
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/2.2/howto/static-files/
+
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+# djoser settings
 
 DJOSER = {
     'HIDE_USERS': False,
@@ -135,7 +156,7 @@ DJOSER = {
     },
     "SERIALIZERS": {
         "user_create": "api.serializers.users.UsersCreateSerializer",
-        "user": "api.serializers.users.UsersInfoSerializer",
-        "current_user": "api.serializers.users.UsersInfoSerializer",
+        "user": "api.serializers.users.UsersSerializer",
+        "current_user": "api.serializers.users.UsersSerializer",
     },
 }
