@@ -1,7 +1,4 @@
-from django.contrib.admin import (ModelAdmin, TabularInline, display, register,
-                                  site)
-from django.utils.html import format_html
-from recipes.forms import TagForm
+from django.contrib.admin import ModelAdmin, TabularInline, register, site
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 
@@ -25,20 +22,10 @@ class IngredientInline(TabularInline):
 
 @register(Tag)
 class TagAdmin(ModelAdmin):
-    form = TagForm
     list_display = ('name', 'color', 'slug')
     search_fields = ('name', 'color')
     save_on_top = True
     empty_value_display = EMPTY_VALUE_DISPLAY
-
-    @display(description='Colored')
-    def color(self, obj: Tag):
-        return format_html(
-            '<span style="color: #{};">{}</span>',
-            obj.color[1:], obj.color
-        )
-
-    color.short_description = 'Цветовой код тэга'
 
 
 @register(Recipe)
