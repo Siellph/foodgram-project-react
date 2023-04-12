@@ -1,30 +1,50 @@
-from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin import ModelAdmin, TabularInline, register, site
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
+from recipes.forms import TagForm
+
+
+site.site_header = 'Администрирование Foodgram'
+EMPTY_VALUE_DISPLAY = 'Значение не указано'
 
 
 @register(Ingredient)
 class IngredientAdmin(ModelAdmin):
     list_display = ('name', 'measurement_unit')
     search_fields = ('name',)
+    list_filter = ('name',)
+    save_on_top = True
+    empty_value_display = EMPTY_VALUE_DISPLAY
+
+
+class IngredientInline(TabularInline):
+    model = RecipeIngredient
+    extra = 2
 
 
 @register(Tag)
 class TagAdmin(ModelAdmin):
+    form = TagForm
     list_display = ('name', 'color', 'slug')
+    search_fields = ('name', 'color')
+    save_on_top = True
+    empty_value_display = EMPTY_VALUE_DISPLAY
 
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
     list_display = ('name', 'author', 'pub_date', 'display_tags', 'favorite')
     list_filter = ('name', 'author', 'tags')
-    search_fields = ('name',)
+    search_fields = ('name', 'author__username', 'tags__name')
     readonly_fields = ('favorite',)
     fields = ('image',
               ('name', 'author'),
               'text',
               ('tags', 'cooking_time'),
               'favorite')
+    inlines = (IngredientInline,)
+    save_on_top = True
+    empty_value_display = EMPTY_VALUE_DISPLAY
 
     def display_tags(self, obj):
         return ', '.join([tag.name for tag in obj.tags.all()])
