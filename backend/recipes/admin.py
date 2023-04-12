@@ -35,7 +35,7 @@ class TagAdmin(ModelAdmin):
 class RecipeAdmin(ModelAdmin):
     list_display = ('name', 'author', 'pub_date', 'display_tags', 'favorite')
     list_filter = ('name', 'author', 'tags')
-    search_fields = ('name', 'author__username', 'tags__name')
+    search_fields = ('name', 'author', 'tags')
     readonly_fields = ('favorite',)
     fields = ('image',
               ('name', 'author'),
